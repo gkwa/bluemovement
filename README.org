@@ -1,0 +1,4 @@
+Practice using golang gob since go-cache uses it and Load functions are deprecated
+
++ https://pkg.go.dev/github.com/patrickmn/go-cache@v2.1.0+incompatible#Cache.Load
++ https://github.com/patrickmn/go-cache#go-cache

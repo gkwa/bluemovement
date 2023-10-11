@@ -1,18 +1,39 @@
-BIN := bluemovement
+ifeq ($(OS),Windows_NT)
+    SOURCES := $(shell dir /S /B *.go)
+else
+    SOURCES := $(shell find . -name '*.go')
+endif
 
-GOPATH := $(shell go env GOPATH)
-GO_FILES := $(shell find . -name "*.go")
+ifeq ($(shell uname),Darwin)
+    GOOS = darwin
+    GOARCH = amd64
+    EXEEXT =
+else ifeq ($(shell uname),Linux)
+    GOOS = linux
+    GOARCH = amd64
+    EXEEXT =
+else ifeq ($(OS),Windows_NT)
+    GOOS = windows
+    GOARCH = amd64
+    EXEEXT = .exe
+endif
 
-$(BIN): $(GO_FILES)
-	gofumpt -w $<
-	go build -o $(BIN) cmd/main.go
+APP := bluemovement$(EXEEXT)
+TARGET := ./dist/bluemovement_$(GOOS)_$(GOARCH)_v1/$(APP)
 
-install: $(GOPATH)/bin/$(BIN)
-.PHONY: install
+$(APP): $(TARGET)
+	cp $< $@
 
-$(GOPATH)/bin/$(BIN): $(BIN)
-	mv $(BIN) $(GOPATH)/bin/$(BIN)
+$(TARGET): $(SOURCES)
+	gofumpt -w $(SOURCES)
+	goreleaser build --single-target --snapshot --clean
+	go vet ./...
 
-clean:
-	rm -f $(BIN)
+all:
+	goreleaser build --snapshot --clean
+
 .PHONY: clean
+clean:
+	rm -f bluemovement
+	rm -f $(TARGET)
+	rm -rf dist

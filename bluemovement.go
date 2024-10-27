@@ -48,7 +48,6 @@ func decodeUser() error {
 	var user User
 
 	if err := decoder.Decode(&user); err != nil {
-		slog.Debug("decode", err.Error())
 		return err
 	}
 
